@@ -1,7 +1,8 @@
 if not isfile("chud.webm") then
     writefile("chud.webm", game:HttpGet("https://rift.uno/chud.webm"))
 end
-local S = Instance.new("ScreenGui")
+
+local s = Instance.new("ScreenGui")
 s.IgnoreGuiInset = true
 s.ResetOnSpawn = false
 s.DisplayOrder =2147483647
