@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090b1a">
+  <title>UserCreation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-a: 8, 10, 24;
+      --bg-b: 18, 21, 48;
+      --tone-a: 67, 86, 255;
+      --tone-b: 186, 78, 241;
+      --tone-c: 36, 202, 222;
+      --tone-d: 224, 67, 149;
+      --tone-e: 108, 152, 255;
+      --interactive: 150, 124, 255;
+      --text: 255, 255, 255;
+      --muted: 190, 193, 216;
+      --line: 255, 255, 255;
+      --danger: 255, 109, 120;
+      --ease: cubic-bezier(.22, 1, .36, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body { width: 100%; height: 100%; min-width: 320px; overflow: hidden; }
+    html { color-scheme: dark; }
+
+    body {
+      font-family: Inter, system-ui, sans-serif;
+      color: rgb(var(--text));
+      background: rgb(var(--bg-a));
+    }
+
+    button, input { font: inherit; color: inherit; }
+    button { -webkit-tap-highlight-color: transparent; }
+
+    .gradient-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at 50% 120%, rgba(var(--tone-c), .12), transparent 48%),
+        radial-gradient(ellipse at 50% -20%, rgba(var(--tone-b), .13), transparent 50%),
+        linear-gradient(135deg, rgb(var(--bg-a)), rgb(var(--bg-b)));
+      background-size: 145% 145%, 145% 145%, 165% 165%;
+      background-position: 48% 52%, 52% 48%, 50% 50%;
+      animation: ambient-flow 14s ease-in-out infinite alternate;
+      transition: background 1.2s ease;
+    }
+
+    .gradient-bg::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: .2;
+      background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size: 74px 74px;
+      mask-image: linear-gradient(to bottom, #000, transparent 86%);
+    }
+
+    .gradient-bg::after {
+      content: "";
+      position: absolute;
+      inset: -5%;
+      z-index: 1;
+      opacity: .25;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='monoNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.88' numOctaves='2' seed='17' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23monoNoise)'/%3E%3C/svg%3E");
+      background-size: 160px 160px;
+      background-blend-mode: multiply;
+      mix-blend-mode: multiply;
+      animation: noise-drift .7s steps(2, end) infinite;
+    }
+
+    .rainbow-wash {
+      position: absolute;
+      inset: -58%;
+      opacity: .78;
+      background: var(--ambient-gradient, conic-gradient(from 0deg at 50% 50%, #ff3864 0deg, #ff9f1c 48deg, #ffe66d 92deg, #3ee58b 145deg, #20d7f2 196deg, #4f7cff 244deg, #a855f7 300deg, #ff4dba 338deg, #ff3864 360deg));
+      filter: blur(92px) saturate(138%);
+      mix-blend-mode: screen;
+      transform-origin: center;
+      will-change: transform, filter, opacity;
+      animation: rainbow-spin 24s linear infinite, rainbow-breathe 7s ease-in-out infinite alternate;
+      transition: opacity .8s var(--ease);
+    }
+
+    .rainbow-wash::after {
+      content: "";
+      position: absolute;
+      inset: 24%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,.34), transparent 64%);
+      filter: blur(30px);
+    }
+
+    body[data-ambient="classic"] .rainbow-wash { opacity: 0; }
+    body[data-ambient="gradient"] .rainbow-wash { inset: -12%; opacity: .9; mix-blend-mode: normal; filter: blur(48px) saturate(118%); background-size: 150% 150%; animation: gradient-layer-flow 12s ease-in-out infinite alternate; }
+    body[data-ambient="gradient"] .rainbow-wash::after { opacity: .18; }
+    body[data-ambient="rainbow"] .orb { opacity: .72; }
+    body[data-ambient="gradient"] .orb { opacity: .12; }
+    .gradient-crossfade-old { position: absolute; z-index: 0; pointer-events: none; will-change: opacity; transition: opacity .9s ease; }
+
+    .aurora {
+      position: absolute;
+      inset: -25%;
+      filter: blur(66px) saturate(120%);
+      opacity: .9;
+      transform: translateZ(0);
+    }
+
+    .orb {
+      position: absolute;
+      width: 55vw;
+      height: 55vw;
+      min-width: 420px;
+      min-height: 420px;
+      border-radius: 50%;
+      mix-blend-mode: screen;
+      will-change: transform;
+      transition: background 1s ease;
+    }
+
+    .orb-a { top: 4%; left: 25%; background: radial-gradient(circle, rgba(var(--tone-a), .8), transparent 64%); animation: orbit-a 30s ease-in-out infinite alternate; }
+    .orb-b { top: 12%; right: 2%; background: radial-gradient(circle, rgba(var(--tone-b), .72), transparent 64%); animation: orbit-b 38s ease-in-out infinite alternate; }
+    .orb-c { right: 16%; bottom: -22%; background: radial-gradient(circle, rgba(var(--tone-d), .63), transparent 66%); animation: orbit-c 34s ease-in-out infinite alternate; }
+    .orb-d { left: -17%; bottom: -15%; background: radial-gradient(circle, rgba(var(--tone-c), .67), transparent 65%); animation: orbit-d 42s ease-in-out infinite alternate; }
+    .orb-e { top: 34%; left: 32%; width: 40vw; height: 40vw; background: radial-gradient(circle, rgba(var(--tone-e), .42), transparent 62%); animation: orbit-e 48s ease-in-out infinite alternate; }
+
+    .interactive {
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 100%;
+      height: 100%;
+      opacity: .24;
+      background: radial-gradient(circle at center, rgba(var(--interactive), .5), transparent 60%);
+      mix-blend-mode: screen;
+      transition: top .55s var(--ease), left .55s var(--ease), background 1s ease;
+    }
+
+    .logo {
+      position: fixed;
+      top: 31px;
+      left: 32px;
+      z-index: 5;
+      color: rgba(var(--text), .84);
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: .01em;
+    }
+
+    .step-count {
+      position: fixed;
+      top: 34px;
+      right: 32px;
+      z-index: 5;
+      color: rgba(var(--muted), .58);
+      font-size: 11px;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+    }
+
+    .page {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 90px 72px 84px;
+      text-align: center;
+      opacity: 1;
+      transition: transform .6s var(--ease), opacity .6s var(--ease);
+    }
+
+    .page.hidden { transform: translateX(-42px); opacity: 0; pointer-events: none; }
+    .page.next { transform: translateX(42px); opacity: 0; pointer-events: none; }
+    .page-content { width: min(720px, 100%); }
+
+    .page.entering .main-text { animation: entrance-title .9s var(--ease) both; }
+    .page.entering .sub-text { animation: entrance-subtitle .95s var(--ease) .07s both; }
+    .page.entering .palette { animation: entrance-control 1s var(--ease) .12s both; }
+    .page.entering .input-container { animation: entrance-control 1s var(--ease) .16s both; }
+    .page.entering .snippet { animation: entrance-control 1s var(--ease) .14s both; }
+    .page.entering .snippet-note { animation: entrance-subtitle .9s var(--ease) .25s both; }
+
+    .eyebrow {
+      margin-bottom: 17px;
+      color: rgb(var(--interactive));
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    .main-text {
+      margin-bottom: 19px;
+      font-size: clamp(44px, 5.7vw, 60px);
+      font-weight: 400;
+      letter-spacing: -.045em;
+      line-height: 1.04;
+      text-wrap: balance;
+      opacity: .94;
+      transition: transform .7s var(--ease), opacity .7s var(--ease);
+    }
+
+    .page.hidden .main-text, .page.next .main-text { transform: translateY(10px); opacity: 0; }
+
+    .sub-text {
+      color: rgba(var(--muted), .78);
+      font-size: 17px;
+      line-height: 1.6;
+      transition: transform .7s var(--ease) .05s, opacity .7s var(--ease) .05s;
+    }
+
+    .page.hidden .sub-text, .page.next .sub-text { transform: translateY(10px); opacity: 0; }
+
+    .input-container {
+      position: relative;
+      width: min(340px, 100%);
+      margin: 29px auto 0;
+      text-align: left;
+      transition: transform .7s var(--ease) .1s, opacity .7s var(--ease) .1s;
+    }
+
+    .input-container::after {
+      content: "";
+      position: absolute;
+      top: 22px;
+      left: 1px;
+      width: 34%;
+      height: 56px;
+      border-radius: 22px;
+      opacity: 0;
+      background: linear-gradient(100deg, transparent, rgba(255,255,255,.26), transparent);
+      filter: blur(2px);
+      pointer-events: none;
+      transform: translateX(-115%) skewX(-16deg);
+    }
+
+    .input-container:focus-within::after {
+      animation: glass-sheen 1.15s var(--ease) both;
+    }
+
+    .page.hidden .input-container, .page.next .input-container { transform: translateY(10px); opacity: 0; }
+
+    .input-label {
+      display: block;
+      margin-bottom: 9px;
+      color: rgba(var(--muted), .6);
+      font-size: 11px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .user-input {
+      width: 100%;
+      height: 56px;
+      padding: 0 17px;
+      border: 1px solid transparent;
+      border-radius: 22px;
+      outline: none;
+      background: linear-gradient(135deg, rgba(255,255,255,.13), rgba(255,255,255,.045)) padding-box, linear-gradient(180deg, rgba(255,255,255,.28) 0%, rgba(255,255,255,.18) 52%, rgba(255,255,255,0) 100%) border-box;
+      box-shadow: inset 0 1px rgba(255,255,255,.18), inset 0 -1px rgba(0,0,0,.14), 0 12px 30px rgba(0,0,0,.12);
+      backdrop-filter: blur(18px) saturate(135%);
+      caret-color: rgb(var(--interactive));
+      transition: border-color .28s var(--ease), background .28s var(--ease), box-shadow .32s var(--ease), transform .28s var(--ease), color .28s ease, text-shadow .4s ease;
+    }
+
+    .user-input::placeholder { color: rgba(var(--muted), .46); }
+    .user-input:hover { border-color: transparent; background: linear-gradient(135deg, rgba(255,255,255,.16), rgba(255,255,255,.06)) padding-box, linear-gradient(180deg, rgba(255,255,255,.36) 0%, rgba(255,255,255,.2) 52%, rgba(255,255,255,0) 100%) border-box; transform: translateY(-1px); }
+    .user-input:focus { border-color: transparent; background: linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.07)) padding-box, linear-gradient(180deg, rgba(var(--interactive), .92) 0%, rgba(var(--interactive), .48) 52%, rgba(var(--interactive), 0) 100%) border-box; box-shadow: inset 0 1px rgba(255,255,255,.2), 0 0 0 4px rgba(var(--interactive), .14), 0 16px 34px rgba(0,0,0,.2); transform: translateY(-2px) scale(1.012); animation: focus-bloom .48s var(--ease); }
+    .user-input.typing-active { color: rgba(var(--text), .98); text-shadow: 0 0 7px rgba(var(--interactive), .28); }
+    .user-input.error { border-color: rgba(var(--danger), .78); animation: shake .35s ease; }
+
+
+    .field-message { min-height: 17px; margin: 8px 0 0; color: rgb(var(--danger)); font-size: 11px; }
+
+    .palette {
+      display: flex;
+      justify-content: center;
+      gap: 11px;
+      margin: 28px auto 0;
+    }
+
+    .palette-wrap { position: relative; width: max-content; max-width: 100%; margin: 0 auto; }
+
+    .swatch {
+      position: relative;
+      display: grid;
+      width: 39px;
+      height: 39px;
+      place-items: center;
+      padding: 4px;
+      border: 1px solid rgba(var(--line), .15);
+      border-radius: 50%;
+      background: rgba(255,255,255,.04);
+      cursor: pointer;
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+
+    .swatch::before { content: ""; width: 100%; height: 100%; border-radius: 50%; background: var(--swatch); animation: swatch-pulse 2.8s ease-in-out infinite alternate; }
+    .swatch[data-color="rainbow"]::before {
+      background: conic-gradient(#ff3864, #ffb21c, #ffe66d, #3ee58b, #20d7f2, #4f7cff, #a855f7, #ff4dba, #ff3864);
+      animation: swatch-rainbow 5s linear infinite, swatch-pulse 2.8s ease-in-out infinite alternate;
+    }
+    .swatch[data-color="rainbow"]::after { filter: drop-shadow(0 1px 2px rgba(0,0,0,.55)); }
+    .swatch:hover { transform: translateY(-2px); border-color: rgba(var(--line), .38); }
+    .swatch[aria-pressed="true"] { border-color: rgb(var(--text)); box-shadow: 0 0 0 3px rgba(var(--interactive), .22); }
+    .swatch[aria-pressed="true"]::after { content: ""; position: absolute; width: 8px; height: 4px; border-bottom: 2px solid #fff; border-left: 2px solid #fff; transform: rotate(-45deg); }
+
+    .more-colors {
+      position: relative;
+      display: flex;
+      width: 39px;
+      height: 39px;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: 0;
+      border: 1px solid rgba(var(--line), .15);
+      border-radius: 50%;
+      color: rgba(var(--text), .68);
+      overflow: hidden;
+      background: rgba(255,255,255,.04);
+      cursor: pointer;
+      transition: color .2s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
+    }
+    .more-colors::before { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: conic-gradient(from 120deg, #ff3864, #ffb21c, #ffe66d, #3ee58b, #20d7f2, #4f7cff, #a855f7, #ff4dba, #ff3864); background-size: 180% 180%; animation: swatch-rainbow 6s linear infinite, more-colors-breathe 2.8s ease-in-out infinite alternate; }
+    .more-colors span { position: relative; z-index: 1; width: 3px; height: 3px; border-radius: 50%; background: #fff; box-shadow: 0 0 4px rgba(0,0,0,.6); }
+    .more-colors:hover, .more-colors[aria-expanded="true"] { color: rgb(var(--text)); border-color: rgba(var(--line), .34); background: rgba(255,255,255,.09); }
+    .more-colors[aria-pressed="true"] { border-color: rgb(var(--text)); box-shadow: 0 0 0 3px rgba(var(--interactive), .22); }
+
+    .gradient-menu {
+      position: absolute;
+      top: calc(100% + 12px);
+      left: 50%;
+      z-index: 8;
+      width: min(216px, calc(100vw - 40px));
+      padding: 12px;
+      border: 1px solid transparent;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(255,255,255,.16), rgba(255,255,255,.065)) padding-box, linear-gradient(180deg, rgba(255,255,255,.34), rgba(255,255,255,.08)) border-box;
+      box-shadow: inset 0 1px rgba(255,255,255,.16), 0 22px 60px rgba(0,0,0,.3);
+      backdrop-filter: blur(28px) saturate(145%);
+      transform: translateX(-50%);
+      animation: menu-in .25s var(--ease) both;
+    }
+    .gradient-menu[hidden] { display: none; }
+    .gradient-menu-title { display: none; }
+    .gradient-grid { display: grid; grid-template-columns: repeat(4, 39px); justify-content: center; gap: 10px; }
+    .gradient-option { position: relative; display: grid; width: 39px; height: 39px; place-items: center; padding: 4px; border: 1px solid rgba(var(--line), .15); border-radius: 50%; color: rgba(var(--text), .72); background: rgba(255,255,255,.04); cursor: pointer; opacity: 0; animation: gradient-option-in .38s var(--ease) both; transition: color .2s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease, transform .18s var(--ease); }
+    .gradient-option:nth-child(1) { animation-delay: .04s; }
+    .gradient-option:nth-child(2) { animation-delay: .08s; }
+    .gradient-option:nth-child(3) { animation-delay: .12s; }
+    .gradient-option:nth-child(4) { animation-delay: .16s; }
+    .gradient-option:nth-child(5) { animation-delay: .2s; }
+    .gradient-option:nth-child(6) { animation-delay: .24s; }
+    .gradient-option:nth-child(7) { animation-delay: .28s; }
+    .gradient-option:nth-child(8) { animation-delay: .32s; }
+    .gradient-option:nth-child(9) { animation-delay: .36s; }
+    .gradient-option:nth-child(10) { animation-delay: .4s; }
+    .gradient-option:nth-child(11) { animation-delay: .44s; }
+    .gradient-option:nth-child(12) { animation-delay: .48s; }
+    .gradient-option:hover { color: rgb(var(--text)); border-color: rgba(var(--line), .38); background: rgba(255,255,255,.09); transform: scale(1.08); }
+    .gradient-option:active { transform: scale(.94); }
+    .gradient-option[aria-pressed="true"] { border-color: rgb(var(--text)); box-shadow: 0 0 0 3px rgba(var(--interactive), .22); }
+    .gradient-option[aria-pressed="true"]::after { content: ""; position: absolute; z-index: 2; width: 8px; height: 4px; border-bottom: 2px solid #fff; border-left: 2px solid #fff; transform: translateY(-1px) rotate(-45deg); filter: drop-shadow(0 1px 2px rgba(0,0,0,.65)); }
+    .gradient-preview { display: block; width: 100%; height: 100%; border: 1px solid rgba(255,255,255,.15); border-radius: 50%; background: var(--gradient); background-size: 220% 220%; box-shadow: inset 0 1px rgba(255,255,255,.18); animation: gradient-preview 4.8s ease-in-out infinite alternate; }
+    .gradient-option[data-gradient="rainbow"] .gradient-preview { background-size: 100% 100%; animation: swatch-rainbow 6s linear infinite; }
+    .gradient-label { display: none; }
+
+    .navigation {
+      position: fixed;
+      top: 50%;
+      z-index: 4;
+      display: flex;
+      width: 48px;
+      height: 48px;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      border: 1px solid transparent;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(255,255,255,.13), rgba(255,255,255,.045)) padding-box, linear-gradient(180deg, rgba(255,255,255,.28) 0%, rgba(255,255,255,.18) 52%, rgba(255,255,255,0) 100%) border-box;
+      box-shadow: inset 0 1px rgba(255,255,255,.18), inset 0 -1px rgba(0,0,0,.14), 0 12px 30px rgba(0,0,0,.12);
+      backdrop-filter: blur(18px) saturate(135%);
+      cursor: pointer;
+      transform: translateY(-50%);
+      transition: background .28s ease, border-color .28s ease, box-shadow .28s ease, transform .2s var(--ease);
+    }
+
+    .navigation:hover { border-color: transparent; background: linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.07)) padding-box, linear-gradient(180deg, rgba(255,255,255,.36) 0%, rgba(255,255,255,.2) 52%, rgba(255,255,255,0) 100%) border-box; box-shadow: inset 0 1px rgba(255,255,255,.2), 0 0 0 4px rgba(var(--interactive), .12), 0 16px 34px rgba(0,0,0,.2); transform: translateY(-50%) scale(1.04); }
+    .navigation:active { transform: translateY(-50%) scale(.97); }
+    .navigation svg { width: 23px; height: 23px; stroke-width: 2.2; }
+    .chevron-right { right: 30px; }
+    .chevron-left { left: 30px; display: none; }
+
+    .page-indicator { position: fixed; bottom: 29px; left: 50%; z-index: 4; display: flex; gap: 8px; transform: translateX(-50%); }
+    .dot { width: 7px; height: 7px; padding: 0; border: 0; border-radius: 50%; background: rgba(var(--text),.25); cursor: pointer; transition: transform .25s, background .25s; }
+    .dot.active { background: rgba(var(--text),.9); transform: scale(1.25); }
+
+    .snippet {
+      position: relative;
+      width: min(760px, 100%);
+      margin: 30px auto 0;
+      overflow: visible;
+      isolation: isolate;
+      border: 1px solid transparent;
+      border-radius: 22px;
+      text-align: left;
+      background: linear-gradient(135deg, rgba(255,255,255,.13), rgba(255,255,255,.045)) padding-box, linear-gradient(180deg, rgba(255,255,255,.28) 0%, rgba(255,255,255,.18) 52%, rgba(255,255,255,0) 100%) border-box;
+      box-shadow: inset 0 1px rgba(255,255,255,.18), inset 0 -1px rgba(0,0,0,.14), 0 12px 30px rgba(0,0,0,.12);
+      backdrop-filter: blur(18px) saturate(135%);
+      transition: transform .7s var(--ease) .1s, opacity .7s var(--ease) .1s;
+    }
+
+    .snippet::after {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      z-index: 0;
+      padding: 1px;
+      border-radius: 24px;
+      opacity: 0;
+      background: linear-gradient(110deg, transparent 28%, rgba(255,255,255,.72) 48%, rgba(var(--interactive), .65) 53%, transparent 72%);
+      background-size: 240% 100%;
+      background-position: 150% 50%;
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      mask-composite: exclude;
+      filter: blur(1px);
+      pointer-events: none;
+      transform: none;
+    }
+
+    .snippet::before {
+      content: "";
+      position: absolute;
+      inset: -15px;
+      z-index: -1;
+      border-radius: 36px;
+      opacity: 0;
+      background: linear-gradient(110deg, transparent 18%, rgba(255,255,255,.5) 44%, rgba(var(--interactive), .72) 52%, rgba(var(--tone-c), .4) 60%, transparent 82%);
+      background-size: 240% 100%;
+      background-position: 150% 50%;
+      filter: blur(14px) saturate(135%);
+      pointer-events: none;
+    }
+
+    .snippet:focus-within::after { animation: border-sheen 1.6s var(--ease) .15s both; }
+    .snippet.shine-entry::after { animation: border-sheen 1.6s var(--ease) .8s both; }
+    .snippet:focus-within::before { animation: outer-sheen 1.6s var(--ease) .15s both; }
+    .snippet.shine-entry::before { animation: outer-sheen 1.6s var(--ease) .8s both; }
+
+    .page.hidden .snippet, .page.next .snippet { transform: translateY(10px); opacity: 0; }
+
+    .copy-button { position: absolute; top: 13px; right: 18px; z-index: 2; display: grid; width: 40px; height: 40px; place-items: center; padding: 0; border: 0; border-radius: 11px; color: rgba(var(--text), .62); background: transparent; cursor: pointer; transition: transform .18s var(--ease), background-color .28s ease, color .28s ease, box-shadow .28s ease; }
+    .copy-button:hover { color: rgb(var(--text)); background-color: rgba(255,255,255,.09); }
+    .copy-button:active { background-color: rgba(255,255,255,.14); transform: translateY(1px) scale(.88); transition-duration: .08s; }
+    .copy-button:focus-visible { outline: 2px solid rgba(var(--interactive), .9); outline-offset: 2px; }
+    .copy-button.copied { color: #8cf0ba; background-color: transparent; box-shadow: none; animation: copy-pop .38s var(--ease); }
+    .copy-icon { position: relative; display: grid; width: 18px; height: 18px; place-items: center; }
+    .copy-icon svg { position: absolute; width: 18px; height: 18px; transition: opacity .2s var(--ease), transform .24s var(--ease); }
+    .copy-icon-bold { opacity: 0; transform: scale(.55) rotate(-10deg); }
+    .copy-button.copied .copy-icon-linear { opacity: 0; transform: scale(.65) rotate(8deg); }
+    .copy-button.copied .copy-icon-bold { opacity: 1; transform: scale(1) rotate(0); }
+    .code-body { max-height: 310px; overflow: auto; padding: 22px 0 24px; outline: none; scrollbar-color: transparent transparent; scrollbar-width: thin; transition: scrollbar-color .28s ease; }
+    .code-body:hover, .code-body:focus { scrollbar-color: rgba(var(--interactive), .56) transparent; }
+    .code-body::-webkit-scrollbar { width: 6px; height: 6px; }
+    .code-body::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+    .code-body::-webkit-scrollbar-track { margin-block: 12px; background: transparent; }
+    .code-body::-webkit-scrollbar-thumb { min-height: 42px; border: 2px solid transparent; border-radius: 999px; background-color: transparent; background-clip: padding-box; box-shadow: inset 0 0 0 1px transparent; transition: background-color .28s ease, box-shadow .28s ease; }
+    .code-body:hover::-webkit-scrollbar-thumb, .code-body:focus::-webkit-scrollbar-thumb { background-color: rgba(var(--interactive), .58); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); }
+    .code-body::-webkit-scrollbar-thumb:hover { background-color: rgba(var(--interactive), .88); }
+    .code-body::-webkit-scrollbar-corner { background: transparent; }
+    pre { margin: 0; white-space: pre; }
+    code { display: block; color: rgba(var(--text), .84); font: 12px/1.78 ui-monospace, SFMono-Regular, Consolas, monospace; tab-size: 2; }
+    .code-line { position: relative; display: block; min-height: 1.78em; padding: 0 72px 0 56px; }
+    .code-line::before { content: attr(data-line); position: absolute; left: 0; width: 38px; color: rgba(var(--muted), .25); text-align: right; user-select: none; }
+    .code-line:hover { background: linear-gradient(90deg, rgba(var(--interactive), .07), transparent 78%); }
+    .lua-comment { color: #6f7895; font-style: italic; }
+    .lua-key { color: #c2a3ff; }
+    .lua-string { color: #79dfc1; }
+    .lua-fn { color: #8fc7ff; }
+    .lua-number { color: #ffbd7a; }
+    .lua-global { color: #f0a3d4; }
+    .snippet-note { margin: 13px auto 0; color: rgba(var(--muted), .5); font-size: 10px; line-height: 1.5; }
+
+    @keyframes orbit-a { from { transform: translate(-3%, -2%) scale(1); } to { transform: translate(7%, 6%) scale(1.08); } }
+    @keyframes orbit-b { from { transform: translate(3%, -4%) scale(1.02); } to { transform: translate(-8%, 8%) scale(.94); } }
+    @keyframes orbit-c { from { transform: translate(5%, 3%) scale(1); } to { transform: translate(-7%, -8%) scale(1.1); } }
+    @keyframes orbit-d { from { transform: translate(-3%, 4%) scale(1.05); } to { transform: translate(8%, -6%) scale(.95); } }
+    @keyframes orbit-e { from { transform: translate(0, -6%) rotate(0deg); } to { transform: translate(4%, 7%) rotate(12deg); } }
+    @keyframes rainbow-spin { to { transform: rotate(360deg) scale(1.04); } }
+    @keyframes rainbow-breathe { from { filter: blur(92px) saturate(128%) hue-rotate(0deg); } to { filter: blur(78px) saturate(155%) hue-rotate(28deg); } }
+    @keyframes ambient-flow { 0% { background-position: 42% 58%, 58% 42%, 0% 50%; } 50% { background-position: 58% 44%, 43% 57%, 50% 50%; } 100% { background-position: 46% 42%, 55% 60%, 100% 50%; } }
+    @keyframes gradient-layer-flow { from { background-position: 0% 45%; transform: scale(1.02); } to { background-position: 100% 55%; transform: scale(1.08); } }
+    @keyframes noise-drift { 0% { transform: translate(0, 0); } 25% { transform: translate(-2%, 1%); } 50% { transform: translate(1%, -2%); } 75% { transform: translate(2%, 2%); } 100% { transform: translate(-1%, 1%); } }
+    @keyframes copy-pop { 0% { transform: scale(1); } 38% { transform: scale(.78); } 72% { transform: scale(1.08); } 100% { transform: scale(1); } }
+    @keyframes border-sheen { 0% { opacity: 0; background-position: 150% 50%; } 15% { opacity: .95; } 70% { opacity: .75; } 100% { opacity: 0; background-position: -50% 50%; } }
+    @keyframes outer-sheen { 0% { opacity: 0; background-position: 150% 50%; transform: scale(.98); } 15% { opacity: .7; } 70% { opacity: .48; } 100% { opacity: 0; background-position: -50% 50%; transform: scale(1.02); } }
+    @keyframes gradient-preview { from { background-position: 0% 50%; transform: scale(1); } to { background-position: 100% 50%; transform: scale(1.035); } }
+    @keyframes more-colors-breathe { from { filter: brightness(.88) saturate(.95); } to { filter: brightness(1.12) saturate(1.2); } }
+    @keyframes menu-in { from { opacity: 0; transform: translateX(-50%) translateY(-5px) scale(.97); } to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); } }
+    @keyframes gradient-option-in { from { opacity: 0; transform: translateY(-5px) scale(.82); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes swatch-rainbow { to { transform: rotate(360deg); } }
+    @keyframes swatch-pulse { from { filter: brightness(.88) saturate(.92); box-shadow: inset 0 0 0 rgba(255,255,255,0); } to { filter: brightness(1.14) saturate(1.16); box-shadow: inset 0 0 8px rgba(255,255,255,.16); } }
+    @keyframes glass-sheen { 0% { opacity: 0; transform: translateX(-115%) skewX(-16deg); } 18% { opacity: .65; } 70% { opacity: .34; } 100% { opacity: 0; transform: translateX(295%) skewX(-16deg); } }
+    @keyframes entrance-title { 0% { opacity: 0; filter: blur(9px); transform: translateY(22px); } 60% { opacity: 1; filter: blur(0); } 100% { opacity: 1; filter: blur(0); transform: translateY(0); } }
+    @keyframes entrance-subtitle { 0% { opacity: 0; filter: blur(6px); transform: translateY(16px); } 100% { opacity: 1; filter: blur(0); transform: translateY(0); } }
+    @keyframes entrance-control { 0% { opacity: 0; filter: blur(8px); transform: translateY(20px) scale(.975); } 65% { opacity: 1; filter: blur(0); } 100% { opacity: 1; filter: blur(0); transform: translateY(0) scale(1); } }
+    @keyframes focus-bloom { 0% { box-shadow: inset 0 1px rgba(255,255,255,.2), 0 0 0 0 rgba(var(--interactive), .34), 0 8px 18px rgba(0,0,0,.12); } 55% { box-shadow: inset 0 1px rgba(255,255,255,.22), 0 0 0 7px rgba(var(--interactive), .08), 0 18px 38px rgba(0,0,0,.22); } 100% { box-shadow: inset 0 1px rgba(255,255,255,.2), 0 0 0 4px rgba(var(--interactive), .14), 0 16px 34px rgba(0,0,0,.2); } }
+    @keyframes shake { 0%,100% { transform: translateX(0); } 35% { transform: translateX(-4px); } 70% { transform: translateX(4px); } }
+
+    @media (max-width: 680px) {
+      .logo { top: 21px; left: 20px; }
+      .step-count { top: 24px; right: 20px; }
+      .page { padding: 82px 20px 74px; }
+      .main-text { font-size: clamp(40px, 11vw, 52px); }
+      .navigation { width: 44px; height: 44px; border-radius: 16px; }
+      .navigation svg { width: 21px; height: 21px; }
+      .chevron-right { right: 13px; }
+      .chevron-left { left: 13px; }
+      .palette { gap: 8px; }
+      .swatch { width: 35px; height: 35px; }
+      .snippet { border-radius: 22px; }
+      .copy-button { top: 11px; right: 16px; width: 38px; height: 38px; border-radius: 10px; }
+      .code-line { padding-right: 64px; padding-left: 48px; }
+      .code-line::before { width: 31px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body data-ambient="rainbow">
+  <div class="gradient-bg" aria-hidden="true"><div class="rainbow-wash"></div><div class="aurora"><div class="orb orb-a"></div><div class="orb orb-b"></div><div class="orb orb-c"></div><div class="orb orb-d"></div><div class="orb orb-e"></div><div class="interactive"></div></div></div>
+  <div class="logo">UserCreation</div>
+
+    <section class="page" id="page1" aria-labelledby="page1Title"><div class="page-content"><h1 class="main-text" id="page1Title">Hey, user</h1><p class="sub-text">What’s your name?</p><div class="input-container"><label class="input-label" for="nameInput">Your name</label><input class="user-input" id="nameInput" type="text" maxlength="40" autocomplete="nickname" placeholder="Enter your name"><p class="field-message" id="nameError" role="alert"></p></div></div></section>
+  <section class="page next" id="page2" aria-labelledby="page2Title"><div class="page-content"><h1 class="main-text" id="page2Title">Great, <span id="greetingName"></span></h1><p class="sub-text">What’s your favourite color?</p><div class="palette-wrap"><div class="palette" aria-label="Color palette"><button class="swatch" type="button" data-color="blue" aria-label="Blue" aria-pressed="false" style="--swatch:#4f64ff"></button><button class="swatch" type="button" data-color="purple" aria-label="Purple" aria-pressed="false" style="--swatch:#a855f7"></button><button class="swatch" type="button" data-color="pink" aria-label="Pink" aria-pressed="false" style="--swatch:#ec4899"></button><button class="swatch" type="button" data-color="orange" aria-label="Orange" aria-pressed="false" style="--swatch:#f97316"></button><button class="swatch" type="button" data-color="green" aria-label="Green" aria-pressed="false" style="--swatch:#22c55e"></button><button class="swatch" type="button" data-color="cyan" aria-label="Cyan" aria-pressed="false" style="--swatch:#06b6d4"></button><button class="swatch" type="button" data-color="yellow" aria-label="Yellow" aria-pressed="false" style="--swatch:#facc15"></button><button class="swatch" type="button" data-color="white" aria-label="White" aria-pressed="false" style="--swatch:#e7e9ff"></button><button class="more-colors" id="moreColorsButton" type="button" aria-label="More color gradients" aria-expanded="false" aria-haspopup="true" aria-pressed="true"><span></span><span></span><span></span></button></div><div class="gradient-menu" id="gradientMenu" hidden><p class="gradient-menu-title">Animated gradients</p><div class="gradient-grid"><button class="gradient-option" type="button" data-gradient="rainbow" aria-label="Rainbow" aria-pressed="true"><span class="gradient-preview" style="--gradient:conic-gradient(from 120deg,#ff3864,#ffb21c,#ffe66d,#3ee58b,#20d7f2,#4f7cff,#a855f7,#ff4dba,#ff3864)"></span><span class="gradient-label">Rainbow</span></button><button class="gradient-option" type="button" data-gradient="sunset" aria-label="Sunset" aria-pressed="false"><span class="gradient-preview" style="--gradient:linear-gradient(105deg,#ff1717 0%,#ff5a1f 45%,#ffe100 100%)"></span><span class="gradient-label">Red to yellow</span></button><button class="gradient-option" type="button" data-gradient="ocean" aria-label="Ocean" aria-pressed="false"><span class="gradient-preview" style="--gradient:linear-gradient(120deg,#073b8c,#09b7b0,#8ef6e4)"></span><span class="gradient-label">Deep ocean</span></button><button class="gradient-option" type="button" data-gradient="aurora" aria-label="Aurora" aria-pressed="false"><span class="gradient-preview" style="--gradient:linear-gradient(120deg,#2dd4bf,#65e572,#8b5cf6)"></span><span class="gradient-label">Aurora</span></button><button class="gradient-option" type="button" data-gradient="berry" aria-label="Berry" aria-pressed="false"><span class="gradient-preview" style="--gradient:linear-gradient(120deg,#7c3aed,#db2777,#fb7185)"></span><span class="gradient-label">Berry bloom</span></button><button class="gradient-option" type="button" data-gradient="fire" aria-label="Fire" aria-pressed="false"><span class="gradient-preview" style="--gradient:linear-gradient(120deg,#7f1d1d,#ef4444,#facc15)"></span><span class="gradient-label">Firelight</span></button><button class="gradient-option" type="button" data-gradient="mint" aria-label="Mint" aria-pressed="false"><span class="gradient-preview" style="--gradient:linear-gradient(120deg,#064e3b,#10b981,#d9f99d)"></span><span class="gradient-label">Mint lime</span></button><button class="gradient-option" type="button" data-gradient="candy" aria-label="Candy" aria-pressed="false"><span class="gradient-preview" style="--gradient:linear-gradient(120deg,#38bdf8,#c084fc,#fb7185)"></span><span class="gradient-label">Candy sky</span></button></div></div></div><div class="input-container"><label class="input-label" for="colorInput">Color</label><input class="user-input" id="colorInput" type="text" maxlength="32" autocomplete="off" value="rainbow" placeholder="Choose a swatch or type a color"><p class="field-message" id="colorError" role="alert"></p></div></div></section>
+  <section class="page next" id="page3" aria-labelledby="page3Title"><div class="page-content"><h1 class="main-text" id="page3Title">Fantastic, you’re all set.</h1><p class="sub-text">Here’s your personalized UserCreation.</p><div class="snippet"><button class="copy-button" id="copyButton" type="button" aria-label="Copy code snippet"><span class="copy-icon" aria-hidden="true"><svg class="copy-icon-linear" viewBox="0 0 24 24" fill="none"><g stroke="currentColor" stroke-width="1.5"><path d="M6 11c0-2.828 0-4.243.879-5.121C7.757 5 9.172 5 12 5h3c2.828 0 4.243 0 5.121.879C21 6.757 21 8.172 21 11v5c0 2.828 0 4.243-.879 5.121C19.243 22 17.828 22 15 22h-3c-2.828 0-4.243 0-5.121-.879C6 20.243 6 18.828 6 16z"/><path d="M6 19a3 3 0 0 1-3-3v-6c0-3.771 0-5.657 1.172-6.828S7.229 2 11 2h4a3 3 0 0 1 3 3"/></g></svg><svg class="copy-icon-bold" viewBox="0 0 24 24" fill="currentColor"><path d="M15.24 2h-3.894c-1.764 0-3.162 0-4.255.148c-1.126.152-2.037.472-2.755 1.193c-.719.721-1.038 1.636-1.189 2.766C3 7.205 3 8.608 3 10.379v5.838c0 1.508.92 2.8 2.227 3.342c-.067-.91-.067-2.185-.067-3.247v-5.01c0-1.281 0-2.386.118-3.27c.127-.948.413-1.856 1.147-2.593s1.639-1.024 2.583-1.152c.88-.118 1.98-.118 3.257-.118h3.07c1.276 0 2.374 0 3.255.118A3.6 3.6 0 0 0 15.24 2"/><path d="M6.6 11.397c0-2.726 0-4.089.844-4.936c.843-.847 2.2-.847 4.916-.847h2.88c2.715 0 4.073 0 4.917.847S21 8.671 21 11.397v4.82c0 2.726 0 4.089-.843 4.936c-.844.847-2.202.847-4.917.847h-2.88c-2.715 0-4.073 0-4.916-.847c-.844-.847-.844-2.21-.844-4.936z"/></svg></span></button><div class="code-body" tabindex="0" aria-label="Generated code snippet"><pre><code id="codeBlock"></code></pre></div></div><p class="snippet-note">Generated from your name and color · discord.gg/usercreation</p></div></section>
+
+  <button class="navigation chevron-right" id="nextButton" type="button" aria-label="Next step"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+  <button class="navigation chevron-left" id="prevButton" type="button" aria-label="Previous step"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+  <nav class="page-indicator" aria-label="Setup progress"><button class="dot active" type="button" data-page="1" aria-label="Step 1"></button><button class="dot" type="button" data-page="2" aria-label="Step 2"></button><button class="dot" type="button" data-page="3" aria-label="Step 3"></button></nav>
+
+  <script>
+    const colors = {
+      blue: { bgA: '8, 10, 30', bgB: '12, 22, 65', tones: ['55, 100, 250', '54, 76, 220', '35, 172, 222', '63, 104, 238', '107, 150, 255'] },
+      purple: { bgA: '20, 7, 32', bgB: '45, 12, 69', tones: ['124, 70, 230', '173, 65, 240', '72, 165, 232', '226, 69, 166', '152, 120, 255'] },
+      pink: { bgA: '32, 7, 23', bgB: '64, 13, 43', tones: ['220, 56, 132', '242, 71, 170', '68, 168, 214', '255, 110, 145', '165, 105, 248'] },
+      orange: { bgA: '31, 13, 5', bgB: '67, 28, 9', tones: ['232, 100, 28', '244, 137, 45', '60, 176, 210', '249, 78, 94', '255, 191, 92'] },
+      green: { bgA: '5, 22, 15', bgB: '10, 47, 31', tones: ['27, 164, 100', '40, 204, 130', '45, 190, 212', '67, 198, 142', '119, 220, 177'] },
+      cyan: { bgA: '4, 22, 29', bgB: '9, 52, 64', tones: ['26, 166, 202', '45, 199, 219', '36, 218, 190', '58, 178, 235', '110, 224, 255'] },
+      yellow: { bgA: '30, 22, 4', bgB: '61, 44, 8', tones: ['226, 177, 31', '248, 206, 55', '65, 175, 213', '240, 127, 49', '255, 229, 116'] },
+      white: { bgA: '28, 29, 39', bgB: '61, 61, 76', tones: ['189, 193, 234', '217, 220, 255', '140, 206, 223', '231, 188, 236', '235, 238, 255'] }
+    };
+
+    const root = document.documentElement.style;
+    const pages = [document.getElementById('page1'), document.getElementById('page2'), document.getElementById('page3')];
+    const nextButton = document.getElementById('nextButton');
+    const prevButton = document.getElementById('prevButton');
+    const nameInput = document.getElementById('nameInput');
+    const colorInput = document.getElementById('colorInput');
+    const greetingName = document.getElementById('greetingName');
+    const codeBlock = document.getElementById('codeBlock');
+    const snippet = document.querySelector('.snippet');
+    const copyButton = document.getElementById('copyButton');
+    const nameError = document.getElementById('nameError');
+    const colorError = document.getElementById('colorError');
+    const moreColorsButton = document.getElementById('moreColorsButton');
+    const gradientMenu = document.getElementById('gradientMenu');
+    const dots = [...document.querySelectorAll('.dot')];
+    const swatches = [...document.querySelectorAll('.swatch')];
+    document.querySelector('.gradient-grid').insertAdjacentHTML('beforeend', `<button class="gradient-option" type="button" data-gradient="lavender" aria-label="Lavender" aria-pressed="false"><span class="gradient-preview" style="--gradient:linear-gradient(120deg,#4f46e5,#a78bfa,#f0abfc)"></span><span class="gradient-label">Lavender</span></button><button class="gradient-option" type="button" data-gradient="tropical" aria-label="Tropical" aria-pressed="false"><span class="gradient-preview" style="--gradient:linear-gradient(120deg,#00b8ff,#00e887,#f7f754)"></span><span class="gradient-label">Tropical</span></button><button class="gradient-option" type="button" data-gradient="rose" aria-label="Rose" aria-pressed="false"><span class="gradient-preview" style="--gradient:linear-gradient(120deg,#be123c,#fb7185,#fda4af)"></span><span class="gradient-label">Rose</span></button><button class="gradient-option" type="button" data-gradient="midnight" aria-label="Midnight" aria-pressed="false"><span class="gradient-preview" style="--gradient:linear-gradient(120deg,#020617,#1e3a8a,#7c3aed)"></span><span class="gradient-label">Midnight</span></button>`);
+    const gradientOptions = [...document.querySelectorAll('.gradient-option')];
+    gradientOptions.forEach(option => { option.title = option.querySelector('.gradient-label').textContent.trim(); });
+    let currentPage = 1;
+    let selectedColor = 'rainbow';
+    let currentSnippet = '';
+
+    const rainbowTheme = {
+      bgA: '8, 10, 24',
+      bgB: '18, 21, 48',
+      tones: ['67, 86, 255', '186, 78, 241', '36, 202, 222', '224, 67, 149', '108, 152, 255']
+    };
+
+    const gradients = {
+      rainbow: { css: 'conic-gradient(from 0deg at 50% 50%, #ff3864 0deg, #ff9f1c 48deg, #ffe66d 92deg, #3ee58b 145deg, #20d7f2 196deg, #4f7cff 244deg, #a855f7 300deg, #ff4dba 338deg, #ff3864 360deg)', theme: rainbowTheme, palette: [[255,56,100],[255,178,28],[255,230,109],[62,229,139],[32,215,242],[79,124,255],[168,85,247],[255,77,186]] },
+      sunset: { css: 'linear-gradient(105deg, #ff1717 0%, #ff5a1f 45%, #ffe100 100%)', theme: { bgA: '38, 4, 3', bgB: '68, 38, 3', tones: ['255,23,23','255,90,31','255,225,0','232,44,17','255,172,13'] }, palette: [[255,23,23],[255,90,31],[255,225,0]] },
+      ocean: { css: 'linear-gradient(120deg, #073b8c, #09b7b0, #8ef6e4)', theme: { bgA: '3, 13, 35', bgB: '4, 48, 60', tones: ['7,59,140','9,183,176','142,246,228','20,112,202','71,220,210'] }, palette: [[7,59,140],[9,183,176],[142,246,228]] },
+      aurora: { css: 'linear-gradient(120deg, #2dd4bf, #65e572, #8b5cf6)', theme: { bgA: '4, 27, 26', bgB: '24, 38, 57', tones: ['45,212,191','101,229,114','139,92,246','31,176,151','120,142,232'] }, palette: [[45,212,191],[101,229,114],[139,92,246]] },
+      berry: { css: 'linear-gradient(120deg, #7c3aed, #db2777, #fb7185)', theme: { bgA: '24, 6, 39', bgB: '58, 11, 46', tones: ['124,58,237','219,39,119','251,113,133','172,55,206','239,76,139'] }, palette: [[124,58,237],[219,39,119],[251,113,133]] },
+      fire: { css: 'linear-gradient(120deg, #7f1d1d, #ef4444, #facc15)', theme: { bgA: '28, 5, 4', bgB: '66, 18, 5', tones: ['127,29,29','239,68,68','250,204,21','211,49,28','247,135,24'] }, palette: [[127,29,29],[239,68,68],[250,204,21]] },
+      mint: { css: 'linear-gradient(120deg, #064e3b, #10b981, #d9f99d)', theme: { bgA: '3, 24, 18', bgB: '8, 52, 34', tones: ['6,78,59','16,185,129','217,249,157','38,148,99','148,226,145'] }, palette: [[6,78,59],[16,185,129],[217,249,157]] },
+      candy: { css: 'linear-gradient(120deg, #38bdf8, #c084fc, #fb7185)', theme: { bgA: '9, 19, 43', bgB: '47, 19, 65', tones: ['56,189,248','192,132,252','251,113,133','111,141,247','224,112,190'] }, palette: [[56,189,248],[192,132,252],[251,113,133]] },
+      lavender: { css: 'linear-gradient(120deg, #4f46e5, #a78bfa, #f0abfc)', theme: { bgA: '15, 13, 45', bgB: '48, 27, 70', tones: ['79,70,229','167,139,250','240,171,252','116,90,237','211,148,251'] }, palette: [[79,70,229],[167,139,250],[240,171,252]] },
+      tropical: { css: 'linear-gradient(120deg, #00b8ff, #00e887, #f7f754)', theme: { bgA: '2, 28, 39', bgB: '11, 58, 34', tones: ['0,184,255','0,232,135','247,247,84','33,201,193','154,242,102'] }, palette: [[0,184,255],[0,232,135],[247,247,84]] },
+      rose: { css: 'linear-gradient(120deg, #be123c, #fb7185, #fda4af)', theme: { bgA: '38, 5, 17', bgB: '72, 18, 37', tones: ['190,18,60','251,113,133','253,164,175','221,55,92','252,139,155'] }, palette: [[190,18,60],[251,113,133],[253,164,175]] },
+      midnight: { css: 'linear-gradient(120deg, #020617, #1e3a8a, #7c3aed)', theme: { bgA: '2, 4, 17', bgB: '10, 16, 47', tones: ['2,6,23','30,58,138','124,58,237','20,38,101','87,57,207'] }, palette: [[2,6,23],[30,58,138],[124,58,237]] }
+    };
+
+    const snippetPalettes = {
+      rainbow: gradients.rainbow.palette,
+      sunset: gradients.sunset.palette,
+      ocean: gradients.ocean.palette,
+      aurora: gradients.aurora.palette,
+      berry: gradients.berry.palette,
+      fire: gradients.fire.palette,
+      mint: gradients.mint.palette,
+      candy: gradients.candy.palette,
+      lavender: gradients.lavender.palette,
+      tropical: gradients.tropical.palette,
+      rose: gradients.rose.palette,
+      midnight: gradients.midnight.palette,
+      blue: [[79, 100, 255]],
+      purple: [[168, 85, 247]],
+      pink: [[236, 72, 153]],
+      orange: [[249, 115, 22]],
+      green: [[34, 197, 94]],
+      cyan: [[6, 182, 212]],
+      yellow: [[250, 204, 21]],
+      white: [[231, 233, 255]]
+    };
+
+    function setPage(pageNumber, focusTarget) {
+      currentPage = pageNumber;
+      pages.forEach((page, index) => { page.classList.toggle('hidden', index + 1 < pageNumber); page.classList.toggle('next', index + 1 > pageNumber); });
+      pages.forEach(page => page.classList.remove('entering'));
+      const enteringPage = pages[pageNumber - 1];
+      enteringPage.classList.add('entering');
+      clearTimeout(window.entranceTimer);
+      window.entranceTimer = setTimeout(() => enteringPage.classList.remove('entering'), 1100);
+      if (pageNumber === 3) {
+        snippet.classList.remove('shine-entry');
+        void snippet.offsetWidth;
+        snippet.classList.add('shine-entry');
+        clearTimeout(window.shineTimer);
+        window.shineTimer = setTimeout(() => snippet.classList.remove('shine-entry'), 2500);
+      }
+      prevButton.style.display = pageNumber === 1 ? 'none' : 'flex';
+      nextButton.style.display = pageNumber === 3 ? 'none' : 'flex';
+      dots.forEach((dot, index) => dot.classList.toggle('active', index === pageNumber - 1));
+      if (focusTarget) setTimeout(() => focusTarget.focus(), 650);
+    }
+
+    function setError(input, messageNode, message) { input.classList.toggle('error', Boolean(message)); messageNode.textContent = message; if (message) input.focus(); }
+    function luaString(value) { return JSON.stringify(String(value)).replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029'); }
+    function escapeHtml(value) { return value.replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character])); }
+    let colorFrame = 0;
+    function rgb(value) { return String(value).split(',').map(Number); }
+    function resolveCssColor(value) {
+      const normalized = value.trim().toLowerCase();
+      if (!normalized || !CSS.supports('color', normalized)) return null;
+      const probe = document.createElement('span');
+      probe.style.color = normalized;
+      probe.style.display = 'none';
+      document.body.appendChild(probe);
+      const resolved = getComputedStyle(probe).color;
+      probe.remove();
+      const match = resolved.match(/rgba?\((\d+(?:\.\d+)?)[,\s]+(\d+(?:\.\d+)?)[,\s]+(\d+(?:\.\d+)?)/i);
+      return match ? match.slice(1, 4).map(Number) : null;
+    }
+    function mix(a, b, amount) { return a.map((channel, index) => Math.round(channel * (1 - amount) + b[index] * amount)); }
+    function paletteFromCss(value) {
+      const base = resolveCssColor(value);
+      if (!base) return null;
+      const brightness = (base[0] * .299) + (base[1] * .587) + (base[2] * .114);
+      const spread = Math.max(...base) - Math.min(...base);
+      const neutral = spread < 12;
+      const darkAnchor = neutral ? [2, 3, 7] : [4, 6, 16];
+      const deepAnchor = neutral ? [10, 11, 17] : [10, 13, 30];
+      const lift = brightness < 35 ? [255, 255, 255] : [255, 255, 255];
+      const tones = brightness < 18
+        ? [mix(base, lift, .08), mix(base, lift, .13), mix(base, lift, .2), mix(base, lift, .28), mix(base, lift, .38)]
+        : brightness > 235
+          ? [mix(base, [0, 0, 0], .1), mix(base, [0, 0, 0], .16), mix(base, [0, 0, 0], .22), mix(base, [0, 0, 0], .28), base]
+          : [mix(base, [0, 0, 0], .12), base, mix(base, lift, .12), mix(base, [0, 0, 0], .24), mix(base, lift, .28)];
+      return {
+        bgA: mix(base, darkAnchor, .9).join(', '),
+        bgB: mix(base, deepAnchor, .75).join(', '),
+        tones: tones.map(color => color.join(', '))
+      };
+    }
+    function updateTheme(colorName) {
+      const normalized = String(colorName).trim().toLowerCase();
+      const gradient = gradients[normalized];
+      const set = gradient ? gradient.theme : paletteFromCss(normalized) || colors[normalized];
+      if (!set) return false;
+      const wash = document.querySelector('.rainbow-wash');
+      const currentWash = getComputedStyle(wash);
+      const oldLayer = wash.cloneNode(false);
+      oldLayer.removeAttribute('class');
+      oldLayer.className = 'gradient-crossfade-old';
+      oldLayer.style.cssText = `inset:${currentWash.inset};opacity:${currentWash.opacity};background-image:${currentWash.backgroundImage};background-size:${currentWash.backgroundSize};background-position:${currentWash.backgroundPosition};filter:${currentWash.filter};mix-blend-mode:${currentWash.mixBlendMode};transform:${currentWash.transform};`;
+      wash.parentElement.insertBefore(oldLayer, wash);
+      document.body.dataset.ambient = normalized === 'rainbow' ? 'rainbow' : gradient ? 'gradient' : 'classic';
+      if (gradient) root.setProperty('--ambient-gradient', gradient.css);
+      else root.removeProperty('--ambient-gradient');
+      requestAnimationFrame(() => requestAnimationFrame(() => { oldLayer.style.opacity = '0'; }));
+      setTimeout(() => oldLayer.remove(), 1000);
+      const targets = { '--bg-a': set.bgA, '--bg-b': set.bgB, '--tone-a': set.tones[0], '--tone-b': set.tones[1], '--tone-c': set.tones[2], '--tone-d': set.tones[3], '--tone-e': set.tones[4], '--interactive': set.tones[4] };
+      const starts = Object.fromEntries(Object.keys(targets).map(key => [key, rgb(getComputedStyle(document.documentElement).getPropertyValue(key))]));
+      const started = performance.now();
+      cancelAnimationFrame(colorFrame);
+      function blend(now) {
+        const progress = Math.min(1, (now - started) / 900);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        Object.entries(targets).forEach(([key, target]) => { const next = rgb(target).map((channel, index) => Math.round(starts[key][index] + (channel - starts[key][index]) * eased)); root.setProperty(key, next.join(', ')); });
+        if (progress < 1) colorFrame = requestAnimationFrame(blend);
+      }
+      colorFrame = requestAnimationFrame(blend);
+      return true;
+    }
+
+    function highlightLua(line) {
+      const keywords = new Set(['local', 'return', 'and', 'or', 'true', 'false', 'nil']);
+      const functions = new Set(['freeze', 'fromRGB', 'pcall', 'assert', 'format', 'HttpGet', 'loadstring']);
+      const globals = new Set(['table', 'Color3', 'game', 'getgenv', '_G']);
+      let output = '';
+      let index = 0;
+      while (index < line.length) {
+        if (line.slice(index, index + 2) === '--') {
+          output += `<span class="lua-comment">${escapeHtml(line.slice(index))}</span>`;
+          break;
+        }
+        const character = line[index];
+        if (character === '"' || character === "'") {
+          const quote = character;
+          let end = index + 1;
+          while (end < line.length) {
+            if (line[end] === '\\') { end += 2; continue; }
+            if (line[end] === quote) { end += 1; break; }
+            end += 1;
+          }
+          output += `<span class="lua-string">${escapeHtml(line.slice(index, end))}</span>`;
+          index = end;
+          continue;
+        }
+        if (/[A-Za-z_]/.test(character)) {
+          let end = index + 1;
+          while (end < line.length && /[A-Za-z0-9_]/.test(line[end])) end += 1;
+          const word = line.slice(index, end);
+          const className = keywords.has(word) ? 'lua-key' : functions.has(word) ? 'lua-fn' : globals.has(word) ? 'lua-global' : '';
+          output += className ? `<span class="${className}">${word}</span>` : word;
+          index = end;
+          continue;
+        }
+        if (/\d/.test(character)) {
+          let end = index + 1;
+          while (end < line.length && /[\d.]/.test(line[end])) end += 1;
+          output += `<span class="lua-number">${line.slice(index, end)}</span>`;
+          index = end;
+          continue;
+        }
+        output += escapeHtml(character);
+        index += 1;
+      }
+      return output || '&nbsp;';
+    }
+
+    function makeSnippet() {
+      const name = nameInput.value.trim();
+      const color = (selectedColor || colorInput.value.trim()).toLowerCase();
+      const resolvedColor = resolveCssColor(color);
+      const palette = snippetPalettes[color] || [resolvedColor || [150, 124, 255]];
+      const paletteLines = palette.map(rgbColor => `    Color3.fromRGB(${rgbColor.join(', ')}),`).join('\n');
+      currentSnippet = `-- Generated by UserCreation\nlocal PROFILE = table.freeze({\n  name = ${luaString(name)},\n  favoriteColor = ${luaString(color)},\n  palette = table.freeze({\n${paletteLines}\n  }),\n})\n\nlocal SOURCE_URL = "https://raw.githubusercontent.com/shadow62x/catbypass/main/upfix"\nlocal environment = (getgenv and getgenv()) or _G\nenvironment.UserCreation = PROFILE\n\nlocal ok, sourceOrError = pcall(game.HttpGet, game, SOURCE_URL)\nassert(ok, ("UserCreation download failed: %s"):format(sourceOrError))\n\nlocal chunk, compileError = loadstring(sourceOrError, "@UserCreation")\nassert(chunk, ("UserCreation compile failed: %s"):format(compileError))\n\nreturn chunk()`;
+      codeBlock.innerHTML = currentSnippet.split('\n').map((line, index) => `<span class="code-line" data-line="${index + 1}">${highlightLua(line)}</span>`).join('');
+    }
+
+    async function copySnippet() {
+      let copied = false;
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(currentSnippet);
+          copied = true;
+        }
+      } catch (error) {}
+      if (!copied) {
+        const fallback = document.createElement('textarea');
+        fallback.value = currentSnippet;
+        fallback.setAttribute('readonly', '');
+        fallback.style.position = 'fixed';
+        fallback.style.opacity = '0';
+        document.body.appendChild(fallback);
+        fallback.select();
+        try { copied = document.execCommand('copy'); } catch (error) { copied = false; }
+        fallback.remove();
+      }
+      copyButton.classList.toggle('copied', copied);
+      copyButton.setAttribute('aria-label', copied ? 'Code copied' : 'Copy failed, try again');
+      clearTimeout(copyButton.resetTimer);
+      copyButton.resetTimer = setTimeout(() => {
+        copyButton.classList.remove('copied');
+        copyButton.setAttribute('aria-label', 'Copy code snippet');
+      }, 1700);
+    }
+    function advance() { if (currentPage === 1) { const name = nameInput.value.trim(); if (!name) return setError(nameInput, nameError, 'Enter your name to continue.'); setError(nameInput, nameError, ''); greetingName.textContent = `${name}.`; setPage(2, colorInput); } else if (currentPage === 2) { const color = (selectedColor || colorInput.value.trim()).toLowerCase(); if (!color) return setError(colorInput, colorError, 'Choose a swatch or type a color.'); if (!updateTheme(color)) return setError(colorInput, colorError, 'Enter a valid color name, hex, RGB, or HSL value.'); setError(colorInput, colorError, ''); selectedColor = color; makeSnippet(); setPage(3); } }
+    function retreat() { if (currentPage === 2) setPage(1, nameInput); if (currentPage === 3) setPage(2, colorInput); }
+
+    nextButton.addEventListener('click', advance); prevButton.addEventListener('click', retreat);
+    copyButton.addEventListener('click', copySnippet);
+    nameInput.addEventListener('keydown', event => { if (event.key === 'Enter') advance(); }); colorInput.addEventListener('keydown', event => { if (event.key === 'Enter') advance(); });
+    function smoothTyping(input) { input.classList.add('typing-active'); clearTimeout(input.typingTimer); input.typingTimer = setTimeout(() => input.classList.remove('typing-active'), 520); }
+    nameInput.addEventListener('input', () => { setError(nameInput, nameError, ''); smoothTyping(nameInput); });
+    function syncColorSelection(colorName) {
+      const normalized = colorName.toLowerCase();
+      swatches.forEach(swatch => swatch.setAttribute('aria-pressed', String(swatch.dataset.color === normalized)));
+      gradientOptions.forEach(option => option.setAttribute('aria-pressed', String(option.dataset.gradient === normalized)));
+      const isGradient = Boolean(gradients[normalized]);
+      moreColorsButton.setAttribute('aria-pressed', String(isGradient));
+    }
+    function closeGradientMenu() { gradientMenu.hidden = true; moreColorsButton.setAttribute('aria-expanded', 'false'); }
+    moreColorsButton.addEventListener('click', () => { gradientMenu.hidden = !gradientMenu.hidden; moreColorsButton.setAttribute('aria-expanded', String(!gradientMenu.hidden)); });
+    gradientOptions.forEach(option => option.addEventListener('click', () => { selectedColor = option.dataset.gradient; colorInput.value = selectedColor; syncColorSelection(selectedColor); updateTheme(selectedColor); setError(colorInput, colorError, ''); closeGradientMenu(); }));
+    document.addEventListener('click', event => { if (!event.target.closest('.palette-wrap')) closeGradientMenu(); });
+    colorInput.addEventListener('input', () => { selectedColor = colorInput.value.trim(); syncColorSelection(selectedColor.toLowerCase()); setError(colorInput, colorError, ''); smoothTyping(colorInput); if (gradients[selectedColor.toLowerCase()] || resolveCssColor(selectedColor)) updateTheme(selectedColor); });
+    swatches.forEach(swatch => swatch.addEventListener('click', () => { selectedColor = swatch.dataset.color; colorInput.value = selectedColor; syncColorSelection(selectedColor); updateTheme(selectedColor); setError(colorInput, colorError, ''); closeGradientMenu(); }));
+    dots.forEach(dot => dot.addEventListener('click', () => { const page = Number(dot.dataset.page); if (page < currentPage) setPage(page, page === 1 ? nameInput : colorInput); }));
+    document.addEventListener('mousemove', event => { const interactive = document.querySelector('.interactive'); interactive.style.top = `${event.clientY / innerHeight * 100 - 50}%`; interactive.style.left = `${event.clientX / innerWidth * 100 - 50}%`; });
+    syncColorSelection('rainbow');
+    updateTheme('rainbow');
+    setPage(1, nameInput);
+  </script>
+</body>
+</html>
