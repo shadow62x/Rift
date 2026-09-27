@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Granny — Auto Play</title>
+<title>Nigger</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body {
@@ -48,7 +48,6 @@
 <body>
 
 <div id="game-wrap">
-  <!-- Auto-loads the real game instantly, no Play Now click needed -->
   <iframe
     id="game-frame"
     src="https://game.azgame.io/granny-horror/"
@@ -67,7 +66,6 @@
 </div>
 
 <script>
-  // Hide loader once the game iframe reports load (plus a small fallback timeout)
   var frame = document.getElementById('game-frame');
   var loader = document.getElementById('loader');
 
@@ -77,11 +75,8 @@
   }
 
   frame.addEventListener('load', function () {
-    // give the game a beat to paint before removing loader
     setTimeout(hideLoader, 800);
   });
-
-  // Fallback: never trap user on loader if load event is blocked
   setTimeout(hideLoader, 8000);
 </script>
 
