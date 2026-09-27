@@ -521,181 +521,86 @@
     .features video { display: none; }
   }
 
-  .cards {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 22px;
-  }
+  /* ——— showcase: UI frame flanked by capability scores ——— */
 
-  .card {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 26px;
-    padding: 38px 34px 34px;
-    background:
-      radial-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1.4px),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.015));
-    background-size: 22px 22px, auto;
-    transition: transform 400ms cubic-bezier(0.22, 1, 0.36, 1), border-color 400ms ease, box-shadow 400ms ease;
-  }
-
-  /* mouse-follow spotlight */
-  .card::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: radial-gradient(420px 320px at var(--mx, 50%) var(--my, -20%), rgba(255, 255, 255, 0.14), transparent 62%);
-    opacity: 0;
-    transition: opacity 400ms ease;
-    pointer-events: none;
-  }
-
-  /* targeting-bracket corners */
-  .card::after {
-    content: "";
-    position: absolute;
-    inset: 12px;
-    border-radius: 18px;
-    pointer-events: none;
-    background:
-      linear-gradient(rgba(255,255,255,.55), rgba(255,255,255,.55)) 0 0      / 18px 1.5px no-repeat,
-      linear-gradient(rgba(255,255,255,.55), rgba(255,255,255,.55)) 0 0      / 1.5px 18px no-repeat,
-      linear-gradient(rgba(255,255,255,.55), rgba(255,255,255,.55)) 100% 0   / 18px 1.5px no-repeat,
-      linear-gradient(rgba(255,255,255,.55), rgba(255,255,255,.55)) 100% 0   / 1.5px 18px no-repeat,
-      linear-gradient(rgba(255,255,255,.55), rgba(255,255,255,.55)) 0 100%   / 18px 1.5px no-repeat,
-      linear-gradient(rgba(255,255,255,.55), rgba(255,255,255,.55)) 0 100%   / 1.5px 18px no-repeat,
-      linear-gradient(rgba(255,255,255,.55), rgba(255,255,255,.55)) 100% 100% / 18px 1.5px no-repeat,
-      linear-gradient(rgba(255,255,255,.55), rgba(255,255,255,.55)) 100% 100% / 1.5px 18px no-repeat;
-    opacity: 0;
-    transform: scale(1.05);
-    transition: opacity 350ms ease, transform 450ms cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  .card:hover {
-    transform: translateY(-8px);
-    border-color: rgba(255, 255, 255, 0.26);
-    box-shadow: 0 30px 60px -24px rgba(0, 0, 0, 0.75), 0 0 44px -14px rgba(255, 255, 255, 0.14);
-  }
-
-  .card:hover::before { opacity: 1; }
-  .card:hover::after  { opacity: 1; transform: none; }
-
-  /* zig-zag bento: card 1 and 4 span 2 columns, icon sits beside text */
-  .card.wide {
-    grid-column: span 2;
-    flex-direction: row;
-    align-items: center;
-    gap: 30px;
-  }
-
-  .card.wide .card-icon { margin-bottom: 0; flex: none; }
-
-  .card-body { min-width: 0; }
-
-  .card-num {
-    position: absolute;
-    top: 18px;
-    right: 24px;
-    font-family: "Harmond", "Poppins", sans-serif;
-    font-weight: 600;
-    font-size: 68px;
-    line-height: 1;
-    letter-spacing: -0.04em;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.03));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    opacity: 0.75;
-    transition: opacity 400ms ease;
-    pointer-events: none;
-  }
-
-  .card:hover .card-num { opacity: 1; }
-
-  .card-icon {
-    position: relative;
-    width: 54px;
-    height: 54px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 16px;
-    background: linear-gradient(#494949cc 0%, #070707cc 100%);
-    border: 1px solid rgba(255, 255, 255, 0.22);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-    margin-bottom: 26px;
-    transition: transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1), border-color 400ms ease, box-shadow 400ms ease;
-  }
-
-  /* rotating light ring around the icon */
-  .card-icon::before {
-    content: "";
-    position: absolute;
-    inset: -5px;
-    border-radius: 21px;
-    padding: 1.5px;
-    background: conic-gradient(from var(--ring, 0deg), transparent 0 55%, rgba(255, 255, 255, 0.9) 78%, rgba(255, 255, 255, 0.15) 88%, transparent 100%);
-    -webkit-mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
-    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
-    z-index: -1;
-    opacity: 0;
-    transition: opacity 300ms ease;
-    pointer-events: none;
-  }
-
-  @property --ring { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+  @property --ring { syntax: "<angle>"; initial-value: 0deg; }
 
   @keyframes ring-spin { to { --ring: 360deg; } }
 
-  .card:hover .card-icon {
-    transform: translateY(-3px);
-    border-color: rgba(255, 255, 255, 0.45);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55), 0 0 24px -6px rgba(255, 255, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  @keyframes tag-ping {
+    0%       { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.35); }
+    70%,100% { box-shadow: 0 0 0 7px rgba(255, 255, 255, 0); }
   }
 
-  .card:hover .card-icon::before { opacity: 1; animation: ring-spin 2.4s linear infinite; }
+  .showcase {
+    display: grid;
+    grid-template-columns: 208px minmax(0, 1fr) 208px;
+    align-items: center;
+    gap: 34px;
+  }
 
-  .card-icon svg { width: 24px; height: 24px; fill: none; stroke: #fff; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  /* ——— centre: UI screenshot frame ——— */
 
-  .card h3 {
+  .ui-frame {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 20px;
+    background:
+      radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1.4px),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.015));
+    background-size: 22px 22px, auto;
+    box-shadow: 0 34px 70px -34px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: border-color 400ms ease, box-shadow 400ms ease, transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .ui-frame:hover {
+    transform: translateY(-6px);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 44px 84px -34px rgba(0, 0, 0, 0.9), 0 0 46px -16px rgba(255, 255, 255, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  }
+
+  .ui-bar {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 11px 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(#49494933 0%, #07070733 100%);
+  }
+
+  .ui-bar b {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.22);
+  }
+
+  .ui-title {
+    margin-left: 6px;
     font-family: "Inter", sans-serif;
-    font-size: 20px;
+    font-size: 10px;
     font-weight: 600;
-    color: #fff;
-    margin-bottom: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.45);
   }
 
-  .card p {
-    font-family: "Inter", sans-serif;
-    font-size: 15px;
-    font-weight: 500;
-    line-height: 1.7;
-    color: rgba(255, 255, 255, 0.55);
-  }
-
-  .card-tag {
+  .ui-live {
+    margin-left: auto;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    margin-top: 20px;
-    padding: 5px 12px;
-    border-radius: 999px;
+    gap: 7px;
     font-family: "Inter", sans-serif;
-    font-size: 11px;
+    font-size: 9.5px;
     font-weight: 600;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.75);
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.6);
   }
 
-  .card-tag::before {
+  .ui-live::before {
     content: "";
     width: 6px;
     height: 6px;
@@ -704,46 +609,102 @@
     animation: tag-ping 2.2s ease-out infinite;
   }
 
-  @keyframes tag-ping {
-    0%       { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.35); }
-    70%,100% { box-shadow: 0 0 0 7px rgba(255, 255, 255, 0); }
-  }
-
-  /* ——— card 02: sUNC benchmark gauge ——— */
-
-  .card.sunc {
+  .ui-body {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    display: flex;
     align-items: center;
-    text-align: center;
-    border-color: rgba(255, 255, 255, 0.18);
-    background:
-      radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1.4px),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.02));
+    justify-content: center;
+    padding: 18px;
   }
 
-  .card.sunc .card-body { display: flex; flex-direction: column; align-items: center; }
-
-  .card-aura {
+  .ui-shot {
     position: absolute;
     inset: 0;
-    z-index: -1;
-    border-radius: 26px;
-    padding: 1.5px;
-    background: conic-gradient(from var(--ring, 0deg), transparent 0 58%, rgba(255, 255, 255, 0.7) 76%, rgba(255, 255, 255, 0.1) 86%, transparent 100%);
-    -webkit-mask: linear-gradient(#000 0 0) padding-box exclude, linear-gradient(#000 0 0);
-    mask: linear-gradient(#000 0 0) padding-box exclude, linear-gradient(#000 0 0);
-    animation: ring-spin 5s linear infinite;
-    pointer-events: none;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
 
-  .sunc-gauge {
+  .ui-frame.no-shot .ui-shot { display: none; }
+
+  .ui-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    border: 1.5px dashed rgba(255, 255, 255, 0.18);
+    border-radius: 14px;
+    text-align: center;
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .ui-frame:not(.no-shot) .ui-hint { display: none; }
+
+  .ui-hint code {
+    padding: 4px 11px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.06);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  .ui-caption {
+    grid-column: 1 / -1;
+    margin-top: 26px;
+    text-align: center;
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.36);
+  }
+
+  /* ——— side scores ——— */
+
+  .score {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .score-label {
+    margin-top: 16px;
+    font-family: "Inter", sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  .score-note {
+    margin-top: 7px;
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.34);
+  }
+
+  .gauge {
     position: relative;
-    width: 176px;
-    height: 176px;
-    margin-bottom: 24px;
-    flex: none;
+    width: 172px;
+    height: 172px;
   }
 
-  .sunc-gauge svg {
+  .gauge svg {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -751,23 +712,24 @@
     overflow: visible;
   }
 
-  .sunc-ring { transform: rotate(-90deg); transform-origin: 60px 60px; }
-  .sunc-track { fill: none; stroke: rgba(255, 255, 255, 0.09); stroke-width: 7; }
-  .sunc-ticks { fill: none; stroke: rgba(255, 255, 255, 0.28); stroke-width: 5; stroke-dasharray: 1.2 4.56; }
+  .gauge-ring { transform: rotate(-90deg); transform-origin: 60px 60px; }
+  .gauge-track { fill: none; stroke: rgba(255, 255, 255, 0.09); stroke-width: 7; }
+  .gauge-ticks { fill: none; stroke: rgba(255, 255, 255, 0.28); stroke-width: 5; stroke-dasharray: 1.2 4.56; transition: stroke 400ms ease; }
 
-  .sunc-fill {
+  .gauge-fill {
     fill: none;
-    stroke: url(#sunc-grad);
+    stroke: url(#gauge-grad);
     stroke-width: 7;
     stroke-linecap: round;
     stroke-dasharray: 326.73;
-    stroke-dashoffset: 13.07;
+    stroke-dashoffset: var(--g-end);
     filter: drop-shadow(0 0 7px rgba(255, 255, 255, 0.45));
+    transition: filter 400ms ease;
   }
 
-  .sunc-sweep {
+  .gauge-sweep {
     position: absolute;
-    inset: 14px;
+    inset: 13px;
     border-radius: 50%;
     background: conic-gradient(from var(--ring, 0deg), rgba(255, 255, 255, 0.14) 0 26deg, transparent 26deg 360deg);
     -webkit-mask: radial-gradient(circle, transparent 0 62%, #000 64% 100%);
@@ -776,19 +738,19 @@
     pointer-events: none;
   }
 
-  .sunc-figure {
+  .gauge-figure {
     position: absolute;
-    inset: 0 0 18px;
+    inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 2px;
   }
 
-  .sunc-value {
+  .gauge-value {
     font-family: "Harmond", "Poppins", sans-serif;
     font-weight: 600;
-    font-size: 58px;
+    font-size: 48px;
     line-height: 1;
     letter-spacing: -0.045em;
     background: linear-gradient(180deg, #fff 0%, rgba(255, 255, 255, 0.62) 100%);
@@ -798,55 +760,40 @@
     font-variant-numeric: tabular-nums;
   }
 
-  .sunc-pct {
+  .gauge-pct {
     font-family: "Harmond", "Poppins", sans-serif;
     font-weight: 600;
-    font-size: 24px;
+    font-size: 20px;
     line-height: 1;
     margin-top: 5px;
     color: rgba(255, 255, 255, 0.6);
   }
 
-  .sunc-cap {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 26%;
-    font-family: "Inter", sans-serif;
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.45);
-  }
-
-  .card.sunc h3 { font-size: 21px; }
-  .card.sunc p { max-width: 30ch; }
-
-  .sunc-ticks, .sunc-fill { transition: stroke 400ms ease, filter 400ms ease; }
-  .card.sunc:hover .sunc-ticks { stroke: rgba(255, 255, 255, 0.5); }
-  .card.sunc:hover .sunc-fill { filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.7)); }
-  .card.sunc:hover .sunc-sweep { animation-duration: 1.6s; }
+  .score:hover .gauge-ticks { stroke: rgba(255, 255, 255, 0.5); }
+  .score:hover .gauge-fill { filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.7)); }
+  .score:hover .gauge-sweep { animation-duration: 1.6s; }
 
   @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
-      @keyframes sunc-draw { from { stroke-dashoffset: 326.73; } to { stroke-dashoffset: 13.07; } }
-      .sunc-fill {
-        animation: sunc-draw 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+      @keyframes gauge-draw { from { stroke-dashoffset: 326.73; } to { stroke-dashoffset: var(--g-end); } }
+      .gauge-fill {
+        animation: gauge-draw 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
         animation-timeline: view();
         animation-range: entry 25% cover 45%;
       }
     }
   }
 
-  @media (max-width: 980px) {
-    .cards { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 1080px) {
+    .showcase { grid-template-columns: 1fr 1fr; gap: 30px; }
+    .ui-frame { grid-column: span 2; order: -1; }
+    .ui-caption { grid-column: span 2; }
   }
 
   @media (max-width: 640px) {
-    .cards { grid-template-columns: 1fr; }
-    .card.wide { grid-column: auto; flex-direction: column; align-items: stretch; gap: 0; }
-    .card.wide .card-icon { margin-bottom: 26px; }
+    .gauge { width: 148px; height: 148px; }
+    .gauge-value { font-size: 42px; }
+    .gauge-pct { font-size: 17px; }
   }
 
   /* pricing */
@@ -1255,13 +1202,9 @@
       animation-range: entry 0% cover 25%;
     }
 
-    .cards .card:nth-child(2),
     .plans .plan:nth-child(2) { animation-range: entry 4% cover 31%; }
 
-    .cards .card:nth-child(3),
     .plans .plan:nth-child(3) { animation-range: entry 8% cover 37%; }
-
-    .cards .card:nth-child(4) { animation-range: entry 12% cover 43%; }
 
     @keyframes reveal-up {
       from { opacity: 0; transform: translateY(44px); }
@@ -1357,62 +1300,56 @@
         <span class="section-eyebrow reveal">Why Rift</span>
         <h2 class="section-title reveal">Built for Roblox</h2>
         <p class="section-sub reveal">A tool that actually respects your rig. Rift runs beside the Roblox client without eating a single frame.</p>
-        <div class="cards">
-          <article class="card wide reveal">
-            <span class="card-num">01</span>
-            <div class="card-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg></div>
-            <div class="card-body">
-              <h3>Instant attach</h3>
-              <p>Opens and is ready before your game finishes loading. No spinners, no waiting on a handshake — just click and it's live.</p>
-              <span class="card-tag">&lt; 200 ms cold start</span>
-            </div>
-          </article>
-          <article class="card sunc reveal">
-            <span class="card-num">02</span>
-            <span class="card-aura" aria-hidden="true"></span>
-            <div class="sunc-gauge" role="img" aria-label="96 percent sUNC capability score">
+        <div class="showcase reveal">
+          <div class="score">
+            <div class="gauge" style="--g-end: 13.07px">
               <svg viewBox="0 0 120 120" aria-hidden="true">
                 <defs>
-                  <linearGradient id="sunc-grad" x1="0" y1="0" x2="1" y2="1">
+                  <linearGradient id="gauge-grad" x1="0" y1="0" x2="1" y2="1">
                     <stop offset="0" stop-color="rgba(255,255,255,0.55)" />
                     <stop offset="0.55" stop-color="#ffffff" />
                     <stop offset="1" stop-color="rgba(255,255,255,0.7)" />
                   </linearGradient>
                 </defs>
-                <g class="sunc-ring">
-                  <circle class="sunc-track" cx="60" cy="60" r="52" />
-                  <circle class="sunc-ticks" cx="60" cy="60" r="44" />
-                  <circle class="sunc-fill" cx="60" cy="60" r="52" />
+                <g class="gauge-ring">
+                  <circle class="gauge-track" cx="60" cy="60" r="52" />
+                  <circle class="gauge-ticks" cx="60" cy="60" r="44" />
+                  <circle class="gauge-fill" cx="60" cy="60" r="52" />
                 </g>
               </svg>
-              <span class="sunc-sweep" aria-hidden="true"></span>
-              <div class="sunc-figure"><span class="sunc-value" id="sunc-value">96</span><span class="sunc-pct">%</span></div>
-              <span class="sunc-cap">sUNC index</span>
+              <span class="gauge-sweep" aria-hidden="true"></span>
+              <div class="gauge-figure"><span class="gauge-value" data-count="96">96</span><span class="gauge-pct">%</span></div>
             </div>
-            <div class="card-body">
-              <h3>Scored, not promised</h3>
-              <p>Rift is re-run against the community sUNC capability benchmark on every Roblox patch. Right now it clears 96%.</p>
-              <span class="card-tag">96% sUNC</span>
+            <span class="score-label">sUNC index</span>
+            <p class="score-note">Stricter capability suite, re-run on every Roblox patch.</p>
+          </div>
+          <div class="ui-frame">
+            <div class="ui-bar">
+              <b></b><b></b><b></b>
+              <span class="ui-title">rift.overlay</span>
+              <span class="ui-live">live</span>
             </div>
-          </article>
-          <article class="card reveal">
-            <span class="card-num">03</span>
-            <div class="card-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></div>
-            <div class="card-body">
-              <h3>Stays out of the way</h3>
-              <p>A clean in-game overlay with transparency and snap zones. Your scripts, your screen — nothing else.</p>
-              <span class="card-tag">Overlay UI</span>
+            <div class="ui-body">
+              <img class="ui-shot" src="assets/ui.png" alt="Rift in-game overlay" onerror="this.closest('.ui-frame').classList.add('no-shot')">
+              <div class="ui-hint"><code>assets/ui.png</code><span>Drop your overlay screenshot here</span></div>
             </div>
-          </article>
-          <article class="card wide reveal">
-            <span class="card-num">04</span>
-            <div class="card-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></div>
-            <div class="card-body">
-              <h3>Always current</h3>
-              <p>Rift updates itself the moment Roblox does, so a client patch never leaves you stuck mid-session.</p>
-              <span class="card-tag">Auto-updates</span>
+          </div>
+          <div class="score">
+            <div class="gauge" style="--g-end: 6.53px">
+              <svg viewBox="0 0 120 120" aria-hidden="true">
+                <g class="gauge-ring">
+                  <circle class="gauge-track" cx="60" cy="60" r="52" />
+                  <circle class="gauge-ticks" cx="60" cy="60" r="44" />
+                  <circle class="gauge-fill" cx="60" cy="60" r="52" />
+                </g>
+              </svg>
+              <span class="gauge-sweep" aria-hidden="true"></span>
+              <div class="gauge-figure"><span class="gauge-value" data-count="98">98</span><span class="gauge-pct">%</span></div>
             </div>
-          </article>
+            <span class="score-label">UNC index</span>
+            <p class="score-note">Full module benchmark across the wider test set.</p>
+          </div>
+          <p class="ui-caption">Both scores are community capability benchmarks, measured on the current Roblox client.</p>
         </div>
       </div>
     </section>
@@ -1517,7 +1454,7 @@
   links.forEach((l, i) => l.addEventListener('click', () => setActive(i)));
   onScroll();
 
-  document.querySelectorAll('.card, .plan').forEach(card => {
+  document.querySelectorAll('.plan').forEach(card => {
     card.addEventListener('pointermove', e => {
       const r = card.getBoundingClientRect();
       card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
@@ -1525,13 +1462,14 @@
     });
   });
 
-  const suncVal = document.getElementById('sunc-value');
-  if (suncVal && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    const runSunc = () => {
+  const counters = [...document.querySelectorAll('.gauge-value[data-count]')];
+  if (counters.length && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const countTo = el => {
+      const to = +el.dataset.count;
       const t0 = performance.now();
       const tick = t => {
         const k = Math.min(1, (t - t0) / 1000);
-        suncVal.textContent = Math.round(96 * (1 - Math.pow(1 - k, 3)));
+        el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3)));
         if (k < 1) requestAnimationFrame(tick);
       };
       requestAnimationFrame(tick);
@@ -1539,9 +1477,9 @@
     const io = new IntersectionObserver(es => {
       if (!es.some(e => e.isIntersecting)) return;
       io.disconnect();
-      runSunc();
-    }, { threshold: 0.6 });
-    io.observe(suncVal.closest('.card'));
+      counters.forEach(countTo);
+    }, { threshold: 0.4 });
+    io.observe(document.querySelector('.showcase'));
   }
 
   const prices = [...document.querySelectorAll('.plan-price')];
