@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>404</title>
+<title>404 — Page not found · Rift</title>
 <meta name="description" content="That page doesn't exist. Rift — download for Windows.">
 <meta name="theme-color" content="#0a0a0a">
 <meta name="robots" content="noindex">
-<link rel="icon" href="assets/rift-logo.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='4' fill='%230a0a0a'/%3E%3Ctext x='8' y='12' font-family='Georgia,serif' font-size='11' font-weight='600' fill='white' text-anchor='middle'%3ER%3C/text%3E%3C/svg%3E">
 <style>
   @font-face {
     font-family: "Harmond";
@@ -33,10 +33,44 @@
 
   html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display: none; }
 
+  /* ---------- design tokens: warm dark + ember accent (matches index) ---------- */
+
+  :root {
+    --bg: #0d0a0b;
+    --ink: #f4ede8;
+    --accent: #f05548;
+    --accent-deep: #9c2b1f;
+    --accent-glow: rgba(240, 85, 72, 0.45);
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .grain {
+    position: fixed;
+    inset: -100%;
+    z-index: 60;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: grain-shift 0.9s steps(4) infinite;
+  }
+
+  @keyframes grain-shift {
+    0%   { transform: translate(0, 0); }
+    25%  { transform: translate(-2%, 1.4%); }
+    50%  { transform: translate(1.6%, -1%); }
+    75%  { transform: translate(-1%, -1.8%); }
+    100% { transform: translate(0, 0); }
+  }
+
   body {
     width: 100%;
     min-height: 100dvh;
-    background: #0b0b0d;
+    background: var(--bg);
+    color: var(--ink);
     overflow-x: hidden;
   }
 
@@ -103,7 +137,7 @@
   .stage-tint {
     position: absolute;
     inset: 0;
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(244, 237, 232, 0.03);
     -webkit-backdrop-filter: blur(43.65px);
     backdrop-filter: blur(43.65px);
   }
@@ -134,7 +168,7 @@
     font-family: "Harmond", "Poppins", sans-serif;
     font-weight: 600;
     letter-spacing: -0.03em;
-    color: rgba(255, 255, 255, 0.09);
+    color: rgba(244, 237, 232, 0.09);
   }
 
   .row span {
@@ -144,9 +178,9 @@
   }
 
   .row:nth-child(1) { font-size: clamp(38px, 5.2vw, 220px); }
-  .row:nth-child(2) { font-size: clamp(22px, 4.4vw, 220px); color: rgba(255, 255, 255, 0.06); }
-  .row:nth-child(3) { font-size: clamp(48px, 6.8vw, 220px); color: rgba(255, 255, 255, 0.11); }
-  .row:nth-child(4) { font-size: clamp(22px, 4.4vw, 220px); color: rgba(255, 255, 255, 0.06); }
+  .row:nth-child(2) { font-size: clamp(22px, 4.4vw, 220px); color: rgba(244, 237, 232, 0.06); }
+  .row:nth-child(3) { font-size: clamp(48px, 6.8vw, 220px); color: rgba(244, 237, 232, 0.11); }
+  .row:nth-child(4) { font-size: clamp(22px, 4.4vw, 220px); color: rgba(244, 237, 232, 0.06); }
   .row:nth-child(5) { font-size: clamp(38px, 5.2vw, 220px); }
 
   .row:nth-child(2) span,
@@ -173,13 +207,18 @@
     font-size: clamp(112px, 21vw, 226px);
     letter-spacing: -0.05em;
     line-height: 1.07;
-    color: rgba(255, 255, 255, 0.85);
     user-select: none;
-    text-shadow: 0 2px 40px rgba(0, 0, 0, 0.35);
+    filter: drop-shadow(0 4px 34px rgba(0, 0, 0, 0.4));
   }
 
+  /* gradient clip per letter (parent-level clip can't see inline-block children) */
   .code .ch {
     display: inline-block;
+    background: linear-gradient(180deg, #f9f3ec 18%, #ecdfd4 58%, #c6b2a5 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
     opacity: 0;
     animation: ch-in 1.4s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
@@ -202,7 +241,7 @@
     font-size: 18px;
     font-weight: 500;
     line-height: 1.6;
-    color: rgba(255, 255, 255, 0.55);
+    color: rgba(244, 237, 232, 0.55);
   }
 
   .actions {
@@ -244,7 +283,7 @@
     bottom: 14px;
     height: 1.5px;
     border-radius: 2px;
-    background: rgba(255, 255, 255, 0.85);
+    background: var(--accent);
     transform: scaleX(0);
     transform-origin: left;
     transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -256,7 +295,7 @@
   .btn-home:hover::after { transform: scaleX(1); }
 
   .btn-home:focus-visible {
-    outline: 2px solid rgba(255, 255, 255, 0.8);
+    outline: 2px solid var(--accent);
     outline-offset: 3px;
   }
 
@@ -278,12 +317,13 @@
 </style>
 </head>
 <body>
+  <div class="grain" aria-hidden="true"></div>
   <a class="logo" href="index.html" aria-label="Rift home">
     <img src="assets/rift-logo.png" alt="Rift logo" width="44" height="44">
   </a>
 
   <main class="stage">
-    <img class="stage-bg" src="assets/hero.jpg" alt="" width="2560" height="1600">
+    <img class="stage-bg" src="assets/glass.jpg" alt="" width="1792" height="1024">
     <div class="stage-tint"></div>
 
     <div class="wall" aria-hidden="true">
